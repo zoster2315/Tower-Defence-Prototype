@@ -6,7 +6,26 @@ public class ObjectPool : MonoBehaviour
 {
     [SerializeField] float spawnTimer = 1f;
     [SerializeField] GameObject enemyPrefab;
+    [SerializeField] int poolSize = 5;
     // Start is called before the first frame update
+
+    GameObject[] pool;
+
+    private void Awake()
+    {
+        PopulatePool();
+    }
+
+    void PopulatePool()
+    {
+        pool = new GameObject[poolSize];
+        for (int i = 0; i < poolSize; i++)
+        {
+            pool[i] = Instantiate(enemyPrefab, transform);
+            pool[i].SetActive(false);
+        }
+    }
+
     void Start()
     {
         StartCoroutine(SpawnEnemy());
@@ -16,8 +35,18 @@ public class ObjectPool : MonoBehaviour
     {
         while (true)
         {
-            Instantiate(enemyPrefab, transform);
+            EnableObjectInPool();
             yield return new WaitForSeconds(spawnTimer);
         }
+    }
+
+    void EnableObjectInPool()
+    {
+        for (int i = 0; i < pool.Length; i++)
+            if (!pool[i].activeSelf)
+            {
+                pool[i].SetActive(true);
+                return;
+            }
     }
 }
