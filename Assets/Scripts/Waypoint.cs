@@ -6,15 +6,15 @@ public class Waypoint : MonoBehaviour
 {
     [SerializeField] bool isPlaceble;
 
-    [SerializeField] GameObject tower;
+    [SerializeField] Tower tower;
     public bool IsPlaceble { get { return isPlaceble; } }
 
     private void OnMouseDown()
     {
         if (isPlaceble)
         {
-            Instantiate(tower, transform.position, Quaternion.identity);
-            isPlaceble = false;
+            if (tower.CreateTower(tower, transform.position))
+                isPlaceble = false;
         }
     }
 }
