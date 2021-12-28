@@ -4,9 +4,11 @@ using UnityEngine;
 
 public class ObjectPool : MonoBehaviour
 {
+    [Range(0.1f, 30f)]
     [SerializeField] float spawnTimer = 1f;
-    [SerializeField] GameObject enemyPrefab;
+    [Range(0, 50)]
     [SerializeField] int poolSize = 5;
+    [SerializeField] GameObject enemyPrefab;
     // Start is called before the first frame update
 
     GameObject[] pool;
