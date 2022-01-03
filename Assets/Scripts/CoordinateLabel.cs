@@ -29,6 +29,7 @@ public class CoordinateLabel : MonoBehaviour
     {
         if (!Application.isPlaying)
         {
+            label.enabled = true;
             DisplayCoordinates();
             UpdateObjectName();
         }
