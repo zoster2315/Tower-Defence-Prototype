@@ -5,39 +5,43 @@ using UnityEngine;
 [RequireComponent(typeof(Enemy))]
 public class EnemyMover : MonoBehaviour
 {
-    [SerializeField] List<Waypoint> path = new List<Waypoint>();
     [SerializeField] [Range(0f, 5f)] float speed = 1f;
 
+    List<Node> path = new List<Node>();
+
     Enemy enemy;
+    GridManager gridManager;
+    PathFinder pathFinder;
     private void Awake()
     {
         enemy = GetComponent<Enemy>();
+        gridManager = FindObjectOfType<GridManager>();
+        pathFinder = FindObjectOfType<PathFinder>();
     }
 
     void OnEnable()
     {
-        FindPath();
         ReturnToStart();
-        StartCoroutine(FollowPath());
+        RecalculatePath(true);
     }
 
     void ReturnToStart()
     {
-        transform.position = path[0].transform.position;
+        transform.position = gridManager.GetPositionFromCoords(pathFinder.StartCoords);
     }
 
-    void FindPath()
+    void RecalculatePath(bool resetPath)
     {
+        Vector2Int coords = new Vector2Int();
+        if (resetPath)
+            coords = pathFinder.StartCoords;
+        else
+            coords = gridManager.GetCoordinatesFromPosition(transform.position);
+
+        StopAllCoroutines();
         path.Clear();
-
-        GameObject parent = GameObject.FindGameObjectWithTag("Path");
-
-        foreach (Transform child in parent.transform)
-        {
-            Waypoint waypoint = child.GetComponent<Waypoint>();
-            if (waypoint != null)
-                path.Add(child.GetComponent<Waypoint>());
-        }
+        path = pathFinder.GetNewPath(coords);
+        StartCoroutine(FollowPath());
     }
 
     void FinishPath()
@@ -48,10 +52,10 @@ public class EnemyMover : MonoBehaviour
 
     IEnumerator FollowPath()
     {
-        foreach (Waypoint wp in path)
+        for (int i = 1; i < path.Count; i++)
         {
             Vector3 startPos = transform.position;
-            Vector3 endPos = wp.transform.position;
+            Vector3 endPos = gridManager.GetPositionFromCoords(path[i].coordinates);
             float travelPersent = 0;
 
             transform.LookAt(endPos);
